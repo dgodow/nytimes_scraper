@@ -1,0 +1,4 @@
+- Given a specific article URL from a website, return the title and content of the article to the user.
+- We suggest using a HTTP library like Requests to get the raw HTML file of the URL. 
+-- Then use a parsing library like Beautiful Soup to parse the content. 
+-- Alternatively, you can also use a Python scraping tool like Scrapy.
