@@ -8,14 +8,26 @@ class WebScraper:
     # article URL; each instance of WebScraper only supports a single URL
     self.url = url
 
-    # final parsed data from the article
-    self.headline = ''
-    self.article_content = ''
-    self.author_byline = ''
-    self.original_pub_date = ''
+    # parsing occurs as soon as the object is instantiated
+    parsed_html = self._get_article(self.url)
 
-    return
+    self.headline = self._parse_article_title(parsed_html)
+    self.article_content = self._parse_article_content(parsed_html)
+    self.author_byline = self._parse_byline(parsed_html)
+    self.original_pub_date = self._parse_original_publication_date(parsed_html)
+    self.updated_date = self._parse_updated_date(parsed_html)
 
+  def __str__(self):
+
+    printable_content = []
+
+    printable_content.append("TITLE: {0}\n".format(self.headline))
+    printable_content.append("AUTHOR: {0}\n".format(self.author_byline))
+    printable_content.append("PUBLICATION DATE: {0}\n\n".format(self.original_pub_date))
+    printable_content.append(self.article_content)
+
+    return "".join(printable_content)
+  
   def _is_headline(self, tag):
 
     return tag.has_attr("data-testid") and tag["data-testid"] == "headline"
@@ -24,10 +36,10 @@ class WebScraper:
 
     return tag.has_attr("name") and tag["name"] == "articleBody"
 
-  def run(self):
+  def _get_article(self, url):
 
-    res = get(self.url)
-    raw_html = res.text
+    html_response = get(url)
+    raw_html = html_response.text
 
     parsed_html = BeautifulSoup(raw_html, "html.parser")
 
@@ -36,11 +48,17 @@ class WebScraper:
     for el in parsed_html.find_all("em"): # Metadata about the article and links to other content, which will always be bolded/italicized in NYT style
       el.decompose()
 
-    # Parse article title -- distinguished by tag with data-testid='headline'
-    headline_tag = parsed_html.find(self._is_headline)
-    self.headline = headline_tag.contents[0]
+    print(parsed_html)
 
-    # Parse article content
+    return parsed_html
+
+  def _parse_article_title(self, parsed_html):
+
+    headline_tag = parsed_html.find(self._is_headline)
+    return headline_tag.contents[0]
+
+  def _parse_article_content(self, parsed_html):
+    
     raw_article_tag = parsed_html.find(self._is_article_content)
     raw_article_tag_content = raw_article_tag.descendants
     raw_parsed_article_content = []
@@ -53,24 +71,28 @@ class WebScraper:
         raw_parsed_article_content.append(el)
 
     parsed_article_content = "".join(raw_parsed_article_content)
-    self.article_content = parsed_article_content
 
-    # Parse author byline
+    return parsed_article_content
+
+  def _parse_byline(self, parsed_html):
+
     raw_author_byline = parsed_html.find("meta", attrs={"name": "byl"})["content"]
-    self.author_byline = raw_author_byline[3:] # remove "By" boilerplate at the start of this attribute
+    author_byline = raw_author_byline[3:] # remove "By" boilerplate at the start of this attribute
 
-    # Parse original publication date
-    original_pub_date = parsed_html.find("meta", property="article:published_time")["content"]
-    self.original_pub_date = original_pub_date
+    return author_byline
 
-    # TODO: Parse updated publication date, if applicable
-    updated_date = parsed_html.find("meta", property="article:modified_time")["content"]
-    self.updated_date = updated_date
+  def _parse_original_publication_date(self, parsed_html):
+
+    return parsed_html.find("meta", property="article:published_time")["content"]
+
+  def _parse_updated_date(self, parsed_html):
+
+    return parsed_html.find("meta", property="article:modified_time")["content"]
 
 def main():
   url = "https://www.nytimes.com/2020/09/02/opinion/remote-learning-coronavirus.html"
   scraper = WebScraper(url)
-  scraper.run()
+  # print(scraper)
 
 if __name__ == "__main__":
   main()
