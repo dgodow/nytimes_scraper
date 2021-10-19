@@ -22,10 +22,6 @@ class WebScraper:
 
     return tag.has_attr("name") and tag["name"] == "articleBody"
 
-  def _is_irrelevant_content(self, tag):
-
-    return tag["name"] == "em"
-
   def run(self):
 
     res = get(self.url)
