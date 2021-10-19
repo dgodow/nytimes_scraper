@@ -1,6 +1,5 @@
 from requests import get
 from bs4 import BeautifulSoup, element
-from re import compile
 
 class WebScraper:
 
@@ -38,20 +37,12 @@ class WebScraper:
       el.decompose()
 
     # Parse article title -- distinguished by tag with data-testid='headline'
-    headline_tag = parsed_html.find_all(self._is_headline)
-
-    if len(headline_tag) > 1:
-      raise RuntimeError("More than one headline returned")
-
-    self.headline = headline_tag[0].contents[0]
+    headline_tag = parsed_html.find(self._is_headline)
+    self.headline = headline_tag.contents[0]
 
     # Parse article content
-    raw_article_tag = parsed_html.find_all(self._is_article_content)
-
-    if len(raw_article_tag) > 1:
-      raise RuntimeError("More than one article content tag returned")
-
-    raw_article_tag_content = raw_article_tag[0].descendants
+    raw_article_tag = parsed_html.find(self._is_article_content)
+    raw_article_tag_content = raw_article_tag.descendants
     raw_parsed_article_content = []
     
     for el in raw_article_tag_content:
@@ -65,20 +56,16 @@ class WebScraper:
     self.article_content = parsed_article_content
 
     # Parse author byline
-    raw_author_byline = parsed_html.find("span", class_=compile("last-byline"))
-    author_byline = ''
-    
-    for el in raw_author_byline.descendants:
-      if isinstance(el, element.NavigableString):
-        author_byline = el
-
-    self.author_byline = author_byline
+    raw_author_byline = parsed_html.find("meta", attrs={"name": "byl"})["content"]
+    self.author_byline = raw_author_byline[3:] # remove "By" boilerplate at the start of this attribute
 
     # Parse original publication date
     original_pub_date = parsed_html.find("meta", property="article:published_time")["content"]
     self.original_pub_date = original_pub_date
 
     # TODO: Parse updated publication date, if applicable
+    updated_date = parsed_html.find("meta", property="article:modified_time")["content"]
+    self.updated_date = updated_date
 
 def main():
   url = "https://www.nytimes.com/2020/09/02/opinion/remote-learning-coronavirus.html"
