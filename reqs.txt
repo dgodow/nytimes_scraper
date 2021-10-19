@@ -2,3 +2,9 @@
 - We suggest using a HTTP library like Requests to get the raw HTML file of the URL. 
 -- Then use a parsing library like Beautiful Soup to parse the content. 
 -- Alternatively, you can also use a Python scraping tool like Scrapy.
+
+OTHER STUFF TO DO:
+
+- Add unit tests
+- Test this out by outputting a lot of articles to a spreadsheet and QAing the data. See what logic we're missing. Would need a way to get available article URLs
+- Run as a scheduled job
