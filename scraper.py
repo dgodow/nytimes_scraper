@@ -1,17 +1,30 @@
 from requests import get
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, element
 
 class WebScraper:
 
   def __init__(self, url):
 
+    # article URL; each instance of WebScraper only supports a single URL
     self.url = url
+
+    # final parsed data from the article
+    self.headline = ''
+    self.article_content = ''
 
     return
 
   def _is_headline(self, tag):
 
     return tag.has_attr("data-testid") and tag["data-testid"] == "headline"
+
+  def _is_article_content(self, tag):
+
+    return tag.has_attr("name") and tag["name"] == "articleBody"
+
+  def _is_irrelevant_content(self, tag):
+
+    return tag["name"] == "em"
 
   def run(self):
 
@@ -26,9 +39,31 @@ class WebScraper:
     if len(headline_tag) > 1:
       raise RuntimeError("More than one headline returned")
 
-    self.headline_content = headline_tag[0].contents[0]
+    self.headline = headline_tag[0].contents[0]
 
-    # TODO: Parse article content
+    raw_article_tag = parsed_html.find_all(self._is_article_content)
+
+    if len(raw_article_tag) > 1:
+      raise RuntimeError("More than one article content tag returned")
+
+    # Remove irrelevant content
+    raw_article_tag[0].figure.decompose() # Audio content
+    for el in raw_article_tag[0].find_all("em"): # Metadata about the article and links to other content, which will always be bolded/italicized in NYT style
+      el.decompose()
+
+    raw_article_tag_content = raw_article_tag[0].descendants
+    raw_parsed_article_content = []
+    
+    for el in raw_article_tag_content:
+
+      # TODO: if the element is a <p> tag, add a newline to preserve the readability of the text.
+
+      if isinstance(el, element.NavigableString):
+        raw_parsed_article_content.append(el)
+
+    
+    parsed_article_content = "".join(raw_parsed_article_content)
+    self.article_content = parsed_article_content
 
     # TODO: Parse author
 
