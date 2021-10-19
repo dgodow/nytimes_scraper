@@ -43,12 +43,12 @@ class WebScraper:
 
     parsed_html = BeautifulSoup(raw_html, "html.parser")
 
-    # Remove irrelevant content from article text
-    parsed_html.figure.decompose() # Audio content
-    for el in parsed_html.find_all("em"): # Metadata about the article and links to other content, which will always be bolded/italicized in NYT style
+    # Remove irrelevant content from article text; no easy way to do this in bs4 without looping twice 
+    for el in parsed_html.find_all("figure"): # Irrelevant graphics; also needed to remove "Listen to This Op-Ed" text for opinion articles
       el.decompose()
 
-    print(parsed_html)
+    for el in parsed_html.find_all("em"): # Metadata about the article and links to other content, which will always be bolded/italicized in NYT style
+      el.decompose()
 
     return parsed_html
 
@@ -92,7 +92,6 @@ class WebScraper:
 def main():
   url = "https://www.nytimes.com/2020/09/02/opinion/remote-learning-coronavirus.html"
   scraper = WebScraper(url)
-  # print(scraper)
 
 if __name__ == "__main__":
   main()
