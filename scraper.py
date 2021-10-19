@@ -13,6 +13,7 @@ class WebScraper:
     self.headline = ''
     self.article_content = ''
     self.author_byline = ''
+    self.original_pub_date = ''
 
     return
 
@@ -31,6 +32,11 @@ class WebScraper:
 
     parsed_html = BeautifulSoup(raw_html, "html.parser")
 
+    # Remove irrelevant content from article text
+    parsed_html.figure.decompose() # Audio content
+    for el in parsed_html.find_all("em"): # Metadata about the article and links to other content, which will always be bolded/italicized in NYT style
+      el.decompose()
+
     # Parse article title -- distinguished by tag with data-testid='headline'
     headline_tag = parsed_html.find_all(self._is_headline)
 
@@ -44,11 +50,6 @@ class WebScraper:
 
     if len(raw_article_tag) > 1:
       raise RuntimeError("More than one article content tag returned")
-
-    # Remove irrelevant content
-    raw_article_tag[0].figure.decompose() # Audio content
-    for el in raw_article_tag[0].find_all("em"): # Metadata about the article and links to other content, which will always be bolded/italicized in NYT style
-      el.decompose()
 
     raw_article_tag_content = raw_article_tag[0].descendants
     raw_parsed_article_content = []
@@ -73,7 +74,9 @@ class WebScraper:
 
     self.author_byline = author_byline
 
-    # TODO: Parse original publication date
+    # Parse original publication date
+    original_pub_date = parsed_html.find("meta", property="article:published_time")["content"]
+    self.original_pub_date = original_pub_date
 
     # TODO: Parse updated publication date, if applicable
 
