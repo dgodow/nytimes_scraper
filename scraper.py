@@ -1,5 +1,6 @@
 from requests import get
 from bs4 import BeautifulSoup, element
+from re import compile
 
 class WebScraper:
 
@@ -11,6 +12,7 @@ class WebScraper:
     # final parsed data from the article
     self.headline = ''
     self.article_content = ''
+    self.author_byline = ''
 
     return
 
@@ -37,6 +39,7 @@ class WebScraper:
 
     self.headline = headline_tag[0].contents[0]
 
+    # Parse article content
     raw_article_tag = parsed_html.find_all(self._is_article_content)
 
     if len(raw_article_tag) > 1:
@@ -57,15 +60,22 @@ class WebScraper:
       if isinstance(el, element.NavigableString):
         raw_parsed_article_content.append(el)
 
-    
     parsed_article_content = "".join(raw_parsed_article_content)
     self.article_content = parsed_article_content
 
-    # TODO: Parse author
+    # Parse author byline
+    raw_author_byline = parsed_html.find("span", class_=compile("last-byline"))
+    author_byline = ''
+    
+    for el in raw_author_byline.descendants:
+      if isinstance(el, element.NavigableString):
+        author_byline = el
 
-    # TODO: Parse updated data
+    self.author_byline = author_byline
 
-    # TODO: Parse byline
+    # TODO: Parse original publication date
+
+    # TODO: Parse updated publication date, if applicable
 
 def main():
   url = "https://www.nytimes.com/2020/09/02/opinion/remote-learning-coronavirus.html"
