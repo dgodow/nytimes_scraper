@@ -2,6 +2,7 @@ from requests import get
 from bs4 import BeautifulSoup, element
 from datetime import datetime
 from sys import argv
+from re import compile, search
 
 class WebScraper:
 
@@ -27,6 +28,22 @@ class WebScraper:
     printable_content.append(self.article_content)
 
     return "".join(printable_content)
+  
+  def _validate_url(self, url):
+    """
+    Ensures that the user entered a correct NYTimes.com URL. The scraper does not support 
+    mobile pages or non-articles (e.g., interactive visualizations), so these are considered invalid.
+    """
+
+    has_valid_protocol = compile("/http:\\/\\/|https:\\/\\/")
+    has_valid_nytimes_url = compile("nytimes.com\\/[12]\d{3}\\/[0-9]{2}\\/[0123][0-9]\\/")
+    is_html_file = compile("\\.html$")
+
+    if search(has_valid_protocol, url) is None or search(is_html_file, url) is None:
+      raise ValueError("Invalid URL.")
+
+    if search(has_valid_nytimes_url, url) is None:
+      raise ValueError("Not a valid NYTimes URL. The scraper does not support mobile NYTimes articles. Please enter a NYTimes web address (e.g., beginning with 'www.nytimes.com', not 'mobile.nytimes.com'.)")
   
   def _is_headline(self, tag):
 
@@ -98,7 +115,8 @@ class WebScraper:
 
   def run(self):
 
-    # parsing occurs as soon as the object is instantiated
+    self._validate_url(self.url)
+    
     parsed_html = self._get_article(self.url)
 
     self.headline = self._parse_article_title(parsed_html)
