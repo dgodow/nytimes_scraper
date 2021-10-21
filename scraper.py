@@ -1,6 +1,7 @@
 from requests import get
 from bs4 import BeautifulSoup, element
 from datetime import datetime
+from sys import argv
 
 class WebScraper:
 
@@ -64,7 +65,8 @@ class WebScraper:
     
     for el in raw_article_tag_content:
 
-      # TODO: if the element is a <p> tag, add a newline to preserve the readability of the text.
+      if isinstance(el, element.Tag) and el.name == "p":
+        raw_parsed_article_content.append("\n\n")
 
       if isinstance(el, element.NavigableString):
         raw_parsed_article_content.append(el)
@@ -106,7 +108,7 @@ class WebScraper:
     self.updated_date = self._parse_updated_date(parsed_html)
 
 def main():
-  url = input("Enter NYTimes URL: ")
+  url = argv[1]
   scraper = WebScraper(url)
   scraper.run()
   print(scraper)
