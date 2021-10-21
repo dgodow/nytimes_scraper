@@ -22,6 +22,7 @@ class WebScraper:
     printable_content.append("TITLE: {0}\n".format(self.headline))
     printable_content.append("AUTHOR: {0}\n".format(self.author_byline))
     printable_content.append("PUBLICATION DATE: {0}\n\n".format(self.original_pub_date))
+    printable_content.append("UPDATED DATE: {0}\n\n".format(self.updated_date))
     printable_content.append(self.article_content)
 
     return "".join(printable_content)
@@ -105,9 +106,10 @@ class WebScraper:
     self.updated_date = self._parse_updated_date(parsed_html)
 
 def main():
-  url = "https://www.nytimes.com/2020/09/02/opinion/remote-learning-coronavirus.html"
+  url = input("Enter NYTimes URL: ")
   scraper = WebScraper(url)
   scraper.run()
+  print(scraper)
 
 if __name__ == "__main__":
   main()
