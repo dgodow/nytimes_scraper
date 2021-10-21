@@ -1,5 +1,6 @@
 from requests import get
 from bs4 import BeautifulSoup, element
+from datetime import datetime
 
 class WebScraper:
 
@@ -80,11 +81,17 @@ class WebScraper:
 
   def _parse_original_publication_date(self, parsed_html):
 
-    return parsed_html.find("meta", property="article:published_time")["content"]
+    raw_pub_date = parsed_html.find("meta", property="article:published_time")["content"]
+    formatted_date = datetime.strptime(raw_pub_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+    return formatted_date
 
   def _parse_updated_date(self, parsed_html):
 
-    return parsed_html.find("meta", property="article:modified_time")["content"]
+    raw_updated_date = parsed_html.find("meta", property="article:modified_time")["content"]
+    formatted_date = datetime.strptime(raw_updated_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+    return formatted_date
 
   def run(self):
 
