@@ -1,6 +1,7 @@
 from requests import get
 from bs4 import BeautifulSoup, element
 from datetime import datetime
+from sys import argv
 
 class WebScraper:
 
@@ -106,7 +107,7 @@ class WebScraper:
     self.updated_date = self._parse_updated_date(parsed_html)
 
 def main():
-  url = input("Enter NYTimes URL: ")
+  url = argv[1]
   scraper = WebScraper(url)
   scraper.run()
   print(scraper)
