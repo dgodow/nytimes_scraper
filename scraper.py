@@ -8,14 +8,11 @@ class WebScraper:
     # article URL; each instance of WebScraper only supports a single URL
     self.url = url
 
-    # parsing occurs as soon as the object is instantiated
-    parsed_html = self._get_article(self.url)
-
-    self.headline = self._parse_article_title(parsed_html)
-    self.article_content = self._parse_article_content(parsed_html)
-    self.author_byline = self._parse_byline(parsed_html)
-    self.original_pub_date = self._parse_original_publication_date(parsed_html)
-    self.updated_date = self._parse_updated_date(parsed_html)
+    self.headline = ''
+    self.article_content = ''
+    self.author_byline = ''
+    self.original_pub_date = ''
+    self.updated_date = ''
 
   def __str__(self):
 
@@ -89,9 +86,21 @@ class WebScraper:
 
     return parsed_html.find("meta", property="article:modified_time")["content"]
 
+  def run(self):
+
+    # parsing occurs as soon as the object is instantiated
+    parsed_html = self._get_article(self.url)
+
+    self.headline = self._parse_article_title(parsed_html)
+    self.article_content = self._parse_article_content(parsed_html)
+    self.author_byline = self._parse_byline(parsed_html)
+    self.original_pub_date = self._parse_original_publication_date(parsed_html)
+    self.updated_date = self._parse_updated_date(parsed_html)
+
 def main():
   url = "https://www.nytimes.com/2020/09/02/opinion/remote-learning-coronavirus.html"
   scraper = WebScraper(url)
+  scraper.run()
 
 if __name__ == "__main__":
   main()
