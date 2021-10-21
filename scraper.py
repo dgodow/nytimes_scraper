@@ -65,7 +65,8 @@ class WebScraper:
     
     for el in raw_article_tag_content:
 
-      # TODO: if the element is a <p> tag, add a newline to preserve the readability of the text.
+      if isinstance(el, element.Tag) and el.name == "p":
+        raw_parsed_article_content.append("\n\n")
 
       if isinstance(el, element.NavigableString):
         raw_parsed_article_content.append(el)
