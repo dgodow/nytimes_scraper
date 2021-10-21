@@ -1,3 +1,4 @@
+from datetime import datetime
 import pytest
 import re
 from scraper import WebScraper
@@ -49,4 +50,10 @@ class TestScraper:
 
     test_publication_date = parser._parse_original_publication_date(parsed_html)
 
-    # TODO: The rest of the test
+    assert isinstance(test_publication_date, datetime)
+
+  def test_updated_date(self, parser, parsed_html):
+
+    test_updated_date = parser._parse_updated_date(parsed_html)
+
+    assert isinstance(test_updated_date, datetime)
