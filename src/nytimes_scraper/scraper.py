@@ -35,7 +35,7 @@ class WebScraper:
     mobile pages or non-articles (e.g., interactive visualizations), so these are considered invalid.
     """
 
-    has_valid_protocol = compile("/http:\\/\\/|https:\\/\\/")
+    has_valid_protocol = compile("http:\\/\\/|https:\\/\\/")
     has_valid_nytimes_url = compile("nytimes.com\\/[12]\d{3}\\/[0-9]{2}\\/[0123][0-9]\\/")
     is_html_file = compile("\\.html$")
 
