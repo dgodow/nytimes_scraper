@@ -67,4 +67,7 @@ class TestScraper:
 
   def test_non_nytimes_url(self):
 
-    non_nytimes_url = ""
+    non_nytimes_url = "https://www.cnn.com/"
+    with pytest.raises(ValueError):
+      scraper = WebScraper(non_nytimes_url)
+      scraper.run()
