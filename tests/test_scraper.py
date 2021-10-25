@@ -1,7 +1,7 @@
 from datetime import datetime
 import pytest
 import re
-from scraper import WebScraper
+from nytimes_scraper.src.nytimes_scraper.scraper import WebScraper
 from bs4 import BeautifulSoup
 
 URL = "https://www.nytimes.com/2020/09/02/opinion/remote-learning-coronavirus.html"
@@ -57,3 +57,17 @@ class TestScraper:
     test_updated_date = parser._parse_updated_date(parsed_html)
 
     assert isinstance(test_updated_date, datetime)
+
+  def test_invalid_url(self):
+
+    invalid_url = "ftp://127.0.0.1/"
+    with pytest.raises(ValueError):
+      scraper = WebScraper(invalid_url)
+      scraper.run()
+
+  def test_non_nytimes_url(self):
+
+    non_nytimes_url = "https://www.cnn.com/"
+    with pytest.raises(ValueError):
+      scraper = WebScraper(non_nytimes_url)
+      scraper.run()
