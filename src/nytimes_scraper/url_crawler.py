@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 from re import compile, match
 from requests import get
 from bs4 import BeautifulSoup, element
@@ -31,11 +31,11 @@ class ArticleURLCrawler:
 
   def crawl(self):
 
-    self.urls = self.get_urls(self.date)
+    todays_date = date.today()
+    self.urls = self.get_urls(todays_date)
 
 def main():
-  todays_date = datetime.date.today()
-  crawler = ArticleURLCrawler(todays_date)
+  crawler = ArticleURLCrawler()
   crawler.crawl()
   
 if __name__ == "__main__":
